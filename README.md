@@ -9,7 +9,7 @@ Options:
 
   --settings    (Default: default.json) Path to the settings file.
 
-  --logging     (Default: true) Write log files.
+  --logging     Write log files.
 
   --help        Display this help screen.
 
