@@ -15,4 +15,13 @@
         <PackageReference Include="Pfim" Version="0.11.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="default.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="performance.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

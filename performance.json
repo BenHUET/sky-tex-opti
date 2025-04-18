@@ -1,0 +1,90 @@
+{
+  "targets": [
+    {
+      "resolution": 512,
+      "suffixes": [
+        "_n.dds", "_normal.dds",
+        "msn.dds",
+        "_p.dds",
+        "_h.dds", "_height.dds",
+        "_e.dds", "_cubemap.dds",
+        "_m.dds", "_reflections.dds",
+        "*_c.dds", "*_color.dds", "*_basecolor.dds",
+        "*_emissive.dds", "*_emit.dds", "*_em.dds",
+        "*_g.dds", "*_glow.dds", "*_gloss.dds",
+        "*_a.dds", "*_alpha.dds",
+        "*_s.dds", "*_specular.dds",
+        "*_sk.dds", "*_sss.dds"
+      ]
+    },
+    {
+      "resolution": 2048,
+      "suffixes": [
+        "_d.dds", ".dds", // files without a known suffix are considered diffuse files
+        "*_b.dds"
+      ]
+    }
+  ],
+  "exclusions": {
+    "filenames": [
+      // --- DO NOT TOUCH : you don't need to remove them if you use them as targets
+      // and even if you don't use them as targets, leave them here
+      "*_d.dds", "*_diffuse.dds",                               // diffuse 
+      "*_n.dds", "*_normal.dds",                                // normal
+      "*_msn.dds",                                              // model space normal
+      "*_m.dds", "*_reflections.dds",                           // reflections
+      "*_sk.dds", "*_sss.dds",                                  // subsurface scattering
+      "*_s.dds", "*_specular.dds",                              // specular
+      "*_g.dds", "*_glow.dds", "*_gloss.dds",                   // glow
+      "*_b.dds",                                                // backlighting
+      "*_e.dds", "*_cubemap.dds",                               // env or cubemap
+      "*_p.dds",                                                // parallax
+      "*_h.dds", "*_height.dds",                                // height
+      "*_c.dds", "*_color.dds", "*_basecolor.dds",              // color
+      "*_emissive.dds", "*_emit.dds", "*_em.dds",               // emission
+      "*_a.dds", "*_alpha.dds",                                 // alpha
+      // --- NOW YOU CAN TOUCH
+      "*_OpenGL.dds",
+      "icewall*.dds",
+      "*DrJ*.dds",
+      "*envmask.dds",
+      "icewall*.dds",
+      "*drj*.dds",
+      "*pot_n.dds",
+      "*tg_field_rocks.dds",
+      "*tg_field_rocks_n.dds",
+      "*tg_snow_pebbles.dds",
+      "*tg_snow_pebbles_n.dds",
+      "*clgorehowl*.dds",
+      "*woodcut.dds",
+      "*woodcut_n.dds",
+      "*dummy.dds",
+      "*lod*_p.dds",
+      "*default_n.dds",
+      "*basket01.dds"
+    ],
+    "paths": [
+      "/interface",
+      "/effects03/newmiller/jewels2",
+      "/littlebaron",
+      "/luxonbeacon",
+      "/landscape/mountains",
+      "/landscape/rocks",
+      "/terrain",
+      "/lod",
+      "/alduin",
+      "/dragon",
+      "/durnehviir",
+      "/odahviing",
+      "/paarthurnax",
+      "/actors/dragon",
+      "/actors/alduin",
+      "/dlc01/actors/undeaddragon",
+      "/dyndolod",
+      "/lodgen",
+      "/!_rudy_misc",
+      "/!sr",
+      "/!!sr"
+    ]
+  }
+}
