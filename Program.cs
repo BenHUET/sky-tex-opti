@@ -18,7 +18,7 @@ class Program
     private static bool _logging = true;
 
     private static Dictionary<string, uint> _targets = new ();
-    private static string[] _exclusionsFilename;
+    private static List<string> _exclusionsFilename;
     private static string[] _exclusionsPath;
 
     private static string _logfileOutputPath;
@@ -52,16 +52,18 @@ class Program
 
                 if (settings == null)
                     throw new FormatException("Unable to parse JSON settings file.");
+                
+                _exclusionsFilename = settings.Exclusions.Filenames.ToList();
 
                 foreach (var target in settings.Targets)
                 {
                     foreach (var suffix in target.Suffixes)
                     {
                         _targets[suffix] = (uint)target.Resolution;
+                        _exclusionsFilename.Remove($"*{suffix}");
                     }
                 }
                 
-                _exclusionsFilename = settings.Exclusions.Filenames;
                 _exclusionsPath = settings.Exclusions.Paths;
 
                 return Run();
