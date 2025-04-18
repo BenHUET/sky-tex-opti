@@ -21,6 +21,6 @@ public class Options
     [Option("settings", Default = "default.json", HelpText = "Path to the settings file.")]
     public string SettingsPath { get; }
     
-    [Option("logging", Default = true, HelpText = "Write log files.")]
+    [Option("logging", HelpText = "Write log files.")]
     public bool LoggingEnabled { get; }
 }

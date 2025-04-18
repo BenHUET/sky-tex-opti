@@ -15,7 +15,7 @@ class Program
     private static DirectoryInfo _profileFolder;
     private static DirectoryInfo _outputFolder;
 
-    private static bool _logging = true;
+    private static bool _logging;
 
     private static Dictionary<string, uint> _targets = new ();
     private static List<string> _exclusionsFilename;
@@ -65,7 +65,7 @@ class Program
                 }
                 
                 _exclusionsPath = settings.Exclusions.Paths;
-
+                
                 return Run();
             });
     }
