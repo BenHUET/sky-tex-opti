@@ -1,6 +1,6 @@
-﻿using System.CommandLine;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Enumeration;
+using CommandLine;
 using ImageMagick;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Archives;
@@ -16,117 +16,86 @@ class Program
     
     private static uint _targetResolutionDiffuse;
     private static uint _targetResolutionNormal;
-    private static uint _targetResolutionParallax;
-    private static uint _targetResolutionMaterial;
-    private static uint _targetResolutionOther;
+    private static uint _targetResolutionModelSpaceNormal;
+    private static uint _targetResolutionReflection;
+    private static uint _targetResolutionSubsurfaceScattering;
+    private static uint _targetResolutionSpecular;
+    private static uint _targetResolutionGlow;
+    private static uint _targetResolutionBacklighting;
+    private static uint _targetResolutionEnvironmentAndCubemap;
+    private static uint _targetResolutionHeight;
 
     private static bool _logging = true;
 
     private static Dictionary<TextureType, string[]> _textureTypesMap = new()
     {
-        { TextureType.Diffuse, ["_d.dds", "_diffuse.dds"] },
+        { TextureType.Diffuse, ["_d.dds"] },
         { TextureType.Normal, ["_n.dds", "_normal.dds"] },
-        { TextureType.Specular, ["_s.dds", "_specular.dds"] },
-        { TextureType.Gloss, ["_g.dds", "_gloss.dds"] },
-        { TextureType.Environment, ["_e.dds", "_environment.dds"] },
-        { TextureType.EnvironmentMask, ["_envmask.dds"] },
-        { TextureType.Height, ["_h.dds", "_height.dds"] },
-        { TextureType.Emissive, ["_em.dds", "_emissive.dds"] },
-        { TextureType.Cube, ["_cubemap.dds", "_cube.dds"] },
-        { TextureType.Light, ["_lm.dds", "_light.dds"] },
-        { TextureType.Detail, ["_d2.dds", "_detail.dds"] },
-        { TextureType.SubsurfaceScattering, ["_sss.dds", "_subsurface.dds"] },
-        { TextureType.Parallax, ["_p.dds", "_parallax.dds"] },
-        { TextureType.AmbientOcclusion, ["_ao.dds", "_ambientocclusion.dds"] },
-        { TextureType.Material, ["_m.dds", "_material.dds"] },
-        { TextureType.Color, ["_c.dds", "_color.dds"] },
-        { TextureType.OpenGL, ["_opengl.dds"] },
-        { TextureType.Bump, ["_b.dds"] },
-        { TextureType.Alpha, ["_a.dds"] },
-        { TextureType.Skin, ["_sk.dds"] },
+        { TextureType.ModelSpaceNormal , ["_msn.dds"] },
+        { TextureType.Reflection, ["_m.dds"] },
+        { TextureType.SubsurfaceScattering, ["_sk.dds"] },
+        { TextureType.Specular, ["_s.dds"] },
+        { TextureType.Glow, ["_g.dds"] },
+        { TextureType.Backlighting, ["_b.dds"] },
+        { TextureType.EnvironmentAndCubemap, ["_e.dds"] },
+        { TextureType.Height, ["_h.dds", "_p.dds"] },
     };
-    private static string[] _exclusionsFilename =
-    [
-        "icewall*.dds", "*drj*.dds", "*pot_n.dds", "*tg_field_rocks.dds",
-        "*tg_field_rocks_n.dds", "*tg_snow_pebbles.dds", "*tg_snow_pebbles_n.dds",
-        "*clgorehowl*.dds", "*woodcut.dds", "*woodcut_n.dds",
-        "*dummy.dds", "*lod*_p.dds", "*default_n.dds", "*basket01.dds"
-    ];
-    private static string[] _exclusionsPath =
-    [
-        "/interface", "/effects03/newmiller/jewels2", "/littlebaron", "/luxonbeacon", "/landscape/mountains", "/landscape/rocks", "/terrain", "/lod",
-        "/alduin", "/dragon", "/durnehviir", "/odahviing", "/paarthurnax", "/actors/dragon", "/actors/alduin", "/dlc01/actors/undeaddragon", "/dyndolod",
-        "/lodgen", "!_rudy_misc", "!sr", "!!sr"
-    ];
-    private static TextureType[] _exclusionsType =
-    [
-        TextureType.Color, TextureType.Emissive, TextureType.Normal, TextureType.OpenGL, TextureType.EnvironmentMask,
-        TextureType.Gloss, TextureType.Specular, TextureType.Skin, TextureType.Bump, TextureType.Alpha, TextureType.Environment,
-        TextureType.Height
-    ];
+
+    private static List<string> _exclusionsFilename = new();
+    private static List<string> _exclusionsPath = new();
+    private static List<TextureType> _includedTypes = new();
 
     private static string _logfileExclusionsPath;
     private static Mutex _logfileExclusionsMutex = new();
     private static string _logfileErrorsPath;
     private static Mutex _logfileErrorsMutex = new();
 
-    static async Task<int> Main(string[] args)
+    static void Main(string[] args)
     {
-        var rootCommand = new RootCommand("Optimize textures.");
+        Parser
+            .Default
+            .ParseArguments<Options>(args)
+            .WithParsed(o =>
+            {
+                _profileFolder = o.ProfilePath;
+                _outputFolder = o.OutputPath;
 
-        var profileOption = new Option<DirectoryInfo>(name: "--profile", description: "Path to the MO2 profile to optimize.") { IsRequired = true };
-        rootCommand.AddOption(profileOption);
+                _targetResolutionDiffuse = o.ResolutionDiffuse;
+                _targetResolutionNormal = o.ResolutionNormal;
+                _targetResolutionModelSpaceNormal = o.ResolutionModelSpaceNormal;
+                _targetResolutionReflection = o.ResolutionReflection;
+                _targetResolutionSubsurfaceScattering = o.ResolutionSubsurfaceScattering;
+                _targetResolutionSpecular = o.ResolutionSpecular;
+                _targetResolutionGlow = o.ResolutionGlow;
+                _targetResolutionBacklighting = o.ResolutionBacklighting;
+                _targetResolutionEnvironmentAndCubemap = o.ResolutionEnvironment;
+                _targetResolutionHeight = o.Resolutionheight;
 
-        var outputOption = new Option<DirectoryInfo>(name: "--output", description: "Path where to store the output.") { IsRequired = true };
-        rootCommand.AddOption(outputOption);
+                _logging = o.LoggingEnabled;
+                
+                foreach (var arg in o.IncludedTypes.Split(','))
+                {
+                    var success = Enum.TryParse(arg.TrimEnd().TrimStart(), out TextureType type);
+                    
+                    if (!success)
+                        throw new ArgumentException("Unknown texture type.");
+                    
+                    _includedTypes.Add(type);
+                }
 
-        var diffuseOption = new Option<uint>(name: "--diffuse", description: "Target resolution for diffuse textures.", getDefaultValue: () => 2048);
-        rootCommand.AddOption(diffuseOption);
-        
-        var normalOption = new Option<uint>(name: "--normal", description: "Target resolution for normal textures.", getDefaultValue: () => 1024);
-        rootCommand.AddOption(normalOption);
-        
-        var parallaxOption = new Option<uint>(name: "--parallax", description: "Target resolution for parallax textures.", getDefaultValue: () => 512);
-        rootCommand.AddOption(parallaxOption);
-        
-        var materialOption = new Option<uint>(name: "--material", description: "Target resolution for material textures.", getDefaultValue: () => 512);
-        rootCommand.AddOption(materialOption);
-        
-        var otherOption = new Option<uint>(name: "--other", description: "Target resolution for other textures.", getDefaultValue: () => 512);
-        rootCommand.AddOption(otherOption);
-        
-        var loggingOption = new Option<bool>(name: "--logging", description: "Write log files.", getDefaultValue: () => true);
-        rootCommand.AddOption(loggingOption);
-        
-        rootCommand.SetHandler(async (
-            profile, 
-            output,
-            diffuse,
-            normal,
-            parallax,
-            material,
-            other,
-            logging) =>
-        {
-            _profileFolder = profile;
-            _outputFolder = output;
-            _targetResolutionDiffuse = diffuse;
-            _targetResolutionNormal = normal;
-            _targetResolutionParallax = parallax;
-            _targetResolutionMaterial = material;
-            _targetResolutionOther = other;
-            _logging = logging;
-            
-            await Run();
-        }, profileOption, outputOption, diffuseOption, normalOption, parallaxOption, materialOption, otherOption, loggingOption);
-        
-        return await rootCommand.InvokeAsync(args);
+                _exclusionsFilename = o.ExcludedFilenames.Split(',').Select(x => x.Trim()).ToList();
+                
+                _exclusionsPath = o.ExcludedPaths
+                    .Split(',')
+                    .Select(x => x.Trim().ToLower().Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar))
+                    .ToList();
+
+                _ = Run();
+            });
     }
 
-    static async Task Run()
+    private static async Task Run()
     {
-        _exclusionsPath = _exclusionsPath.Select(p => p.ToLower().Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar)).ToArray();
-
         _logfileExclusionsPath = Path.Combine(_outputFolder.FullName, "exclusions.log");
         _logfileErrorsPath = Path.Combine(_outputFolder.FullName, "errors.log");
         
@@ -330,10 +299,15 @@ class Program
 
     static TextureType GuessTextureType(string path)
     {
-        var type = _textureTypesMap
-            .FirstOrDefault(e => e.Value
-                .Any(path.EndsWith))
-            .Key;
+        var type = TextureType.Diffuse;
+        foreach (var entry in _textureTypesMap)
+        {
+            if (entry.Value.Any(path.EndsWith))
+            {
+                type = entry.Key;
+                break;
+            }
+        }
 
         return type;
     }
@@ -355,7 +329,7 @@ class Program
             }
 
         var textureType = GuessTextureType(path);
-        if (_exclusionsType.Contains(textureType))
+        if (!_includedTypes.Contains(textureType))
         {
             WriteLogExclusion($"matches type {textureType}\t{path}");
             return true;
@@ -430,9 +404,15 @@ class Program
         {
             TextureType.Diffuse => _targetResolutionDiffuse,
             TextureType.Normal => _targetResolutionNormal,
-            TextureType.Parallax => _targetResolutionParallax,
-            TextureType.Material => _targetResolutionMaterial,
-            _ => _targetResolutionOther
+            TextureType.ModelSpaceNormal => _targetResolutionModelSpaceNormal,
+            TextureType.Reflection => _targetResolutionReflection,
+            TextureType.SubsurfaceScattering => _targetResolutionSubsurfaceScattering,
+            TextureType.Specular => _targetResolutionSpecular,
+            TextureType.Glow => _targetResolutionGlow,
+            TextureType.Backlighting => _targetResolutionBacklighting,
+            TextureType.EnvironmentAndCubemap => _targetResolutionEnvironmentAndCubemap,
+            TextureType.Height => _targetResolutionHeight,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 
