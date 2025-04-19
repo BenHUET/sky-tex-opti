@@ -4,7 +4,6 @@
       "resolution": 512,
       "suffixes": [
         "_n.dds", "_normal.dds",
-        "_msn.dds",
         "_p.dds",
         "_h.dds", "_height.dds",
         "_e.dds", "_cubemap.dds",
@@ -21,6 +20,7 @@
     {
       "resolution": 2048,
       "suffixes": [
+        "_msn.dds",
         "_b.dds",
         "_d.dds", "_diffuse.dds", ".dds" // files without a known suffix are considered diffuse files
       ]
