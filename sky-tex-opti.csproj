@@ -3,25 +3,27 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
-        <RootNamespace>sky_tex_opti</RootNamespace>
+        <RootNamespace>SkyTexOpti</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="2.9.1" />
-        <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.6.0" />
-        <PackageReference Include="Mutagen.Bethesda" Version="0.49.0" />
-        <PackageReference Include="Pfim" Version="0.11.3" />
+        <PackageReference Include="CommandLineParser" Version="2.9.1"/>
+        <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.6.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4"/>
+        <PackageReference Include="Mutagen.Bethesda" Version="0.49.0"/>
+        <PackageReference Include="Pfim" Version="0.11.3"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="default.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="performance.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <None Update="default.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="performance.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

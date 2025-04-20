@@ -1,17 +1,16 @@
-namespace sky_tex_opti.POCO;
+namespace SkyTexOpti.POCO;
 
 public record Settings(
-    Target[] Targets, 
+    Target[] Targets,
     Exclusions Exclusions
 );
 
 public record Exclusions(
-    string[] Filenames, 
+    string[] Filenames,
     string[] Paths
 );
 
 public record Target(
-    string[] Suffixes, 
+    string[] Suffixes,
     int Resolution
 );
-
