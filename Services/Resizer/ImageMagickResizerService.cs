@@ -13,24 +13,31 @@ public class ImageMagickResizerService(
         var outputPath = Path.Combine(options.OutputPath!.FullName, texture.TextureRelativePath);
         new DirectoryInfo(outputPath).Parent!.Create();
 
-        using var image = new MagickImage(stream);
+        try
+        {
+            using var image = new MagickImage(stream);
 
-        var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
-        var initialResolution = PrettyResolution(image.Width, image.Height);
+            var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
+            var initialResolution = PrettyResolution(image.Width, image.Height);
 
-        float scaleFactor;
-        if (image.Width < image.Height)
-            scaleFactor = targetResolution / (float)image.Width;
-        else
-            scaleFactor = targetResolution / (float)image.Height;
+            float scaleFactor;
+            if (image.Width < image.Height)
+                scaleFactor = targetResolution / (float)image.Width;
+            else
+                scaleFactor = targetResolution / (float)image.Height;
 
-        image.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
-        await image.WriteAsync(outputPath);
+            image.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+            await image.WriteAsync(outputPath);
 
-        stream.Close();
-        
-        await loggingService.WriteGeneralLog($"from {initialResolution} to {PrettyResolution(image.Width, image.Height)} (x{scaleFactor})", texture);
-        
+            stream.Close();
+
+            await loggingService.WriteGeneralLog($"From {initialResolution} to {PrettyResolution(image.Width, image.Height)} (x{scaleFactor})", texture);
+        }
+        catch (Exception e)
+        {
+            await loggingService.WriteErrorLog($"Failed to resize {texture.TextureRelativePath}, reason : {e.Message}");
+        }
+
         string PrettyResolution(uint width, uint height)
         {
             return $"{width}x{height}";

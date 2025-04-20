@@ -46,7 +46,7 @@ public class DefaultExclusionService(Options options) : IExclusionService
 
         if (headers.Height <= targetResolution || headers.Width <= targetResolution)
         {
-            reason = "too small";
+            reason = "Too small";
             return true;
         }
 

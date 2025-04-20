@@ -78,21 +78,21 @@ public class DefaultDiscoveryService(
         if (exclusionService.IsExcludedByFilename(texture, out var matchingFilenamePattern))
         {
             _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"matches {matchingFilenamePattern}", texture);
+            await loggingService.WriteExclusionLog($"Matches {matchingFilenamePattern}", texture);
             return;
         }
 
         if (exclusionService.IsExludedByPath(texture, out var matchingPathPattern))
         {
             _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"matches {matchingPathPattern}", texture);
+            await loggingService.WriteExclusionLog($"Matches {matchingPathPattern}", texture);
             return;
         }
 
         if (exclusionService.IsExcludedByTarget(texture, out var matchingTarget))
         {
             _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"matches {matchingTarget}", texture);
+            await loggingService.WriteExclusionLog($"Matches {matchingTarget}", texture);
             return;
         }
 
