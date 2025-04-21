@@ -17,12 +17,6 @@ public class Options
     [Option("settings", Default = "default.json", HelpText = "Path to the settings file.")]
     public string? SettingsPath { get; init; }
 
-    [Option("logging", HelpText = "Write log files.")]
-    public bool LoggingEnabled { get; init; }
-
-    [Option("overwrite", HelpText = "Overwrite output folder.")]
-    public bool OverwriteEnabled { get; init; }
-
     public Dictionary<string, uint> Targets { get; set; } = new();
     public List<string> ExclusionsFilename { get; set; } = [];
     public List<string> ExclusionsPath { get; set; } = [];

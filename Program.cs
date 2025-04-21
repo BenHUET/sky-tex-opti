@@ -52,16 +52,9 @@ public static class Program
         // Check output folder
         if (options.OutputPath!.Exists && Directory.EnumerateFileSystemEntries(options.OutputPath.FullName).Any())
         {
-            if (options.OverwriteEnabled)
-            {
-                options.OutputPath.Delete(true);
-            }
-            else
-            {
-                Console.WriteLine("Output folder already exsists and is not empty. Please pick another path.");
-                Console.ReadKey();
-                return;
-            }
+            Console.WriteLine("Output folder already exsists and is not empty. Please pick another path.");
+            Console.ReadKey();
+            return;
         }
 
         options.OutputPath.Create();

@@ -23,9 +23,6 @@ public class LoggingService(
 
     private async Task WriteLog(string path, string content)
     {
-        if (!options.LoggingEnabled)
-            return;
-
         await File.AppendAllTextAsync(path, $"\n{content}");
     }
 }
