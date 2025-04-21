@@ -3,35 +3,22 @@
     {
       "resolution": 512,
       "suffixes": [
-        "_n.dds",
-        "_normal.dds",
+        "_n.dds", "_normal.dds",
         "_p.dds",
-        "_h.dds",
-        "_height.dds"
+        "_h.dds", "_height.dds"
       ]
     },
     {
       "resolution": 1024,
       "suffixes": [
-        "_e.dds",
-        "_cubemap.dds",
-        "_m.dds",
-        "_reflections.dds",
-        "_c.dds",
-        "_color.dds",
-        "_basecolor.dds",
-        "_emissive.dds",
-        "_emit.dds",
-        "_em.dds",
-        "_g.dds",
-        "_glow.dds",
-        "_gloss.dds",
-        "_a.dds",
-        "_alpha.dds",
-        "_s.dds",
-        "_specular.dds",
-        "_sk.dds",
-        "_sss.dds",
+        "_e.dds", "_cubemap.dds",
+        "_m.dds", "_reflections.dds",
+        "_c.dds", "_color.dds", "_basecolor.dds",
+        "_emissive.dds", "_emit.dds", "_em.dds",
+        "_g.dds", "_glow.dds", "_gloss.dds",
+        "_a.dds", "_alpha.dds",
+        "_s.dds", "_specular.dds",
+        "_sk.dds", "_sss.dds",
         "_envmask.dds"
       ]
     },
@@ -40,10 +27,7 @@
       "suffixes": [
         "_msn.dds",
         "_b.dds",
-        "_d.dds",
-        "_diffuse.dds",
-        ".dds"
-        // files without a known suffix are considered diffuse files
+        "_d.dds", "_diffuse.dds", ".dds" // files without a known suffix are considered diffuse files
       ]
     }
   ],
@@ -51,50 +35,21 @@
     "filenames": [
       // --- DO NOT TOUCH : you don't need to remove them if you use them as targets
       // and even if you don't use them as targets, leave them here
-      "*_d.dds",
-      "*_diffuse.dds",
-      // diffuse 
-      "*_n.dds",
-      "*_normal.dds",
-      // normal
-      "*_msn.dds",
-      // model space normal
-      "*_m.dds",
-      "*_reflections.dds",
-      // reflections
-      "*_sk.dds",
-      "*_sss.dds",
-      // subsurface scattering
-      "*_s.dds",
-      "*_specular.dds",
-      // specular
-      "*_g.dds",
-      "*_glow.dds",
-      "*_gloss.dds",
-      // glow
-      "*_b.dds",
-      // backlighting
-      "*_e.dds",
-      "*_cubemap.dds",
-      // env or cubemap
-      "*_p.dds",
-      // parallax
-      "*_h.dds",
-      "*_height.dds",
-      // height
-      "*_c.dds",
-      "*_color.dds",
-      "*_basecolor.dds",
-      // color
-      "*_emissive.dds",
-      "*_emit.dds",
-      "*_em.dds",
-      // emission
-      "*_a.dds",
-      "*_alpha.dds",
-      // alpha
-      "*_envmask.dds",
-      // environment mask
+      "*_d.dds", "*_diffuse.dds",                               // diffuse 
+      "*_n.dds", "*_normal.dds",                                // normal
+      "*_msn.dds",                                              // model space normal
+      "*_m.dds", "*_reflections.dds",                           // reflections
+      "*_sk.dds", "*_sss.dds",                                  // subsurface scattering
+      "*_s.dds", "*_specular.dds",                              // specular
+      "*_g.dds", "*_glow.dds", "*_gloss.dds",                   // glow
+      "*_b.dds",                                                // backlighting
+      "*_e.dds", "*_cubemap.dds",                               // env or cubemap
+      "*_p.dds",                                                // parallax
+      "*_h.dds", "*_height.dds",                                // height
+      "*_c.dds", "*_color.dds", "*_basecolor.dds",              // color
+      "*_emissive.dds", "*_emit.dds", "*_em.dds",               // emission
+      "*_a.dds", "*_alpha.dds",                                 // alpha
+      "*_envmask.dds",                                          // environment mask
       // --- NOW YOU CAN TOUCH
       "*_OpenGL.dds",
       "icewall*.dds",
