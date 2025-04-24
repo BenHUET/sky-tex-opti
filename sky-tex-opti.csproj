@@ -19,10 +19,10 @@
 
     <ItemGroup>
         <None Update="default.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
         <None Update="performance.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
     </ItemGroup>
 

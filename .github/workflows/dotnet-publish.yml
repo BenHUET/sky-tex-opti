@@ -1,0 +1,40 @@
+name: release project on new tag
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - '*'
+jobs:
+  build:
+    name: build for ${{ matrix.runtime }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+            - runtime: linux-x64
+            - runtime: win-x64
+            - runtime: osx-x64
+            - runtime: osx-arm64
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: restore
+        run: dotnet restore
+      - name: publish
+        run: dotnet publish sky-tex-opti.csproj -c Release -r ${{ matrix.runtime }} -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=false -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true -o publish/sky-tex-opti_${{ matrix.runtime }}
+      - name: zip
+        run: |
+          cd publish
+          zip -r ../sky-tex-opti_${{ matrix.runtime }}.zip sky-tex-opti_${{ matrix.runtime }}
+        shell: bash
+      - name: upload
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: sky-tex-opti_${{ matrix.runtime }}.zip
+          allowUpdates: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
