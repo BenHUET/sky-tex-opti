@@ -3,7 +3,6 @@
     {
       "resolution": 512,
       "suffixes": [
-        "_n.dds", "_normal.dds",
         "_p.dds",
         "_h.dds", "_height.dds",
         "_e.dds", "_cubemap.dds",
@@ -15,6 +14,12 @@
         "_s.dds", "_specular.dds",
         "_sk.dds", "_sss.dds",
         "_envmask.dds"
+      ]
+    },
+    {
+      "resolution": 1024,
+      "suffixes": [
+        "_n.dds", "_normal.dds"
       ]
     },
     {
