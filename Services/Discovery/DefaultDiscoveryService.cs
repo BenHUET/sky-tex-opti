@@ -35,6 +35,7 @@ public class DefaultDiscoveryService(
                 {
                     var texture = new Texture
                     {
+                        Mod = mod,
                         BsaPath = archive.FullName,
                         TextureRelativePath = file.Path.ToLower()
                     };
@@ -48,6 +49,7 @@ public class DefaultDiscoveryService(
             {
                 var texture = new Texture
                 {
+                    Mod = mod,
                     TextureRelativePath = Path.GetRelativePath(mod.Path.FullName, looseTexture.FullName).ToLower(),
                     TextureAbsolutePath = looseTexture.FullName
                 };

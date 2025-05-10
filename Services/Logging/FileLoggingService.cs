@@ -8,12 +8,12 @@ public class LoggingService(
 {
     public async Task WriteGeneralLog(string content, Texture texture)
     {
-        await WriteLog(Path.Combine(options.OutputPath!.FullName, "main.log"), $"{content}\t\t\t\t\t\t{texture.TextureRelativePath}");
+        await WriteLog(Path.Combine(options.OutputPath!.FullName, "main.log"), $"{content} - {texture.Mod.Name} - {texture.TextureRelativePath}");
     }
 
     public async Task WriteExclusionLog(string reason, Texture texture)
     {
-        await WriteLog(Path.Combine(options.OutputPath!.FullName, "exclusions.log"), $"{reason}\t\t\t\t\t\t{texture.TextureRelativePath}");
+        await WriteLog(Path.Combine(options.OutputPath!.FullName, "exclusions.log"), $"{reason} - {texture.Mod.Name} - {texture.TextureRelativePath}");
     }
 
     public async Task WriteErrorLog(string content)
