@@ -10,7 +10,7 @@ public class DefaultDiscoveryService(
     ILoggingService loggingService
 ) : IDiscoveryService
 {
-    private readonly Dictionary<string, Texture> _discoveredTextures = new();
+    private readonly Dictionary<string, Texture?> _discoveredTextures = new();
     private int _exclusionsCount;
 
     public async Task<ICollection<Texture>> GetTextures(IList<Mod> mods)
@@ -63,22 +63,31 @@ public class DefaultDiscoveryService(
             $"\r(100 % - {mods.Count}/{mods.Count} - {watch.Elapsed:c}) Discovering textures to optimize... Found {_discoveredTextures.Count:n0} textures to optimize ({_exclusionsCount:n0} excluded).");
 
         return _discoveredTextures
-            .Select(e => e.Value)
+            .Values
+            .Where(t => t != null)
+            .Select(t => t!)
             .ToList();
     }
 
     private async Task ProcessTexture(Texture texture, Func<Stream> getStream)
     {
         if (!texture.TextureRelativePath.StartsWith("textures/") || !texture.TextureRelativePath.EndsWith(".dds"))
+        {
+            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
+        }
 
         if (_discoveredTextures.ContainsKey(texture.TextureRelativePath))
+        {
+            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
+        }
 
         if (exclusionService.IsExcludedByFilename(texture, out var matchingFilenamePattern))
         {
             _exclusionsCount++;
             await loggingService.WriteExclusionLog($"Matches {matchingFilenamePattern}", texture);
+            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
@@ -86,6 +95,7 @@ public class DefaultDiscoveryService(
         {
             _exclusionsCount++;
             await loggingService.WriteExclusionLog($"Matches {matchingPathPattern}", texture);
+            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
@@ -93,6 +103,7 @@ public class DefaultDiscoveryService(
         {
             _exclusionsCount++;
             await loggingService.WriteExclusionLog($"Matches {matchingTarget}", texture);
+            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
@@ -103,12 +114,14 @@ public class DefaultDiscoveryService(
             {
                 _exclusionsCount++;
                 await loggingService.WriteExclusionLog(exclusionResolutionReason!, texture);
+                _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
                 return;
             }
         }
         catch (Exception e)
         {
             await loggingService.WriteErrorLog($"Unable to open {texture.TextureRelativePath}, reason : {e.Message}");
+            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
