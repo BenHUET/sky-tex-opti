@@ -57,16 +57,18 @@ public class DefaultDiscoveryService(
         }
 
         watch.Stop();
-
-        Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-        Console.WriteLine(
-            $"\r(100 % - {mods.Count}/{mods.Count} - {watch.Elapsed:c}) Discovering textures to optimize... Found {_discoveredTextures.Count:n0} textures to optimize ({_exclusionsCount:n0} excluded).");
-
-        return _discoveredTextures
+        
+        var results = _discoveredTextures
             .Values
             .Where(t => t != null)
             .Select(t => t!)
             .ToList();
+
+        Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
+        Console.WriteLine(
+            $"\r(100 % - {mods.Count}/{mods.Count} - {watch.Elapsed:c}) Discovering textures to optimize... Found {results.Count:n0} textures to optimize ({_exclusionsCount:n0} excluded).");
+
+        return results;
     }
 
     private async Task ProcessTexture(Texture texture, Func<Stream> getStream)
