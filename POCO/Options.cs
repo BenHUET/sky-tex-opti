@@ -16,6 +16,9 @@ public class Options
 
     [Option("settings", Default = "default.json", HelpText = "Path to the settings file.")]
     public string? SettingsPath { get; init; }
+    
+    [Option("resume", Default = false, HelpText = "Will use an existing output folder and process only missing files.")]
+    public bool Resume { get; init; }
 
     public Dictionary<string, uint> Targets { get; set; } = new();
     public List<string> ExclusionsFilename { get; set; } = [];

@@ -52,4 +52,9 @@ public class DefaultExclusionService(Options options) : IExclusionService
 
         return false;
     }
+
+    public bool IsAlreadyExistant(Texture texture)
+    {
+        return options.Resume && new FileInfo(Path.Combine(options.OutputPath!.FullName, texture.TextureRelativePath)).Exists;
+    }
 }

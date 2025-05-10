@@ -50,7 +50,7 @@ public static class Program
     )
     {
         // Check output folder
-        if (options.OutputPath!.Exists && Directory.EnumerateFileSystemEntries(options.OutputPath.FullName).Any())
+        if (options.OutputPath!.Exists && Directory.EnumerateFileSystemEntries(options.OutputPath.FullName).Any() && !options.Resume)
         {
             Console.WriteLine("Output folder already exsists and is not empty. Please pick another path.");
             Console.ReadKey();

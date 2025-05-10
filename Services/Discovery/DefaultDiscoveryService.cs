@@ -75,38 +75,29 @@ public class DefaultDiscoveryService(
 
     private async Task ProcessTexture(Texture texture, Func<Stream> getStream)
     {
-        if (!texture.TextureRelativePath.StartsWith("textures/") || !texture.TextureRelativePath.EndsWith(".dds"))
+        if (!texture.TextureRelativePath.StartsWith("textures/") 
+            || !texture.TextureRelativePath.EndsWith(".dds")
+            || _discoveredTextures.ContainsKey(texture.TextureRelativePath))
         {
             _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
-        if (_discoveredTextures.ContainsKey(texture.TextureRelativePath))
-        {
-            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
-            return;
-        }
-
-        if (exclusionService.IsExcludedByFilename(texture, out var matchingFilenamePattern))
+        if (exclusionService.IsAlreadyExistant(texture))
         {
             _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"Matches {matchingFilenamePattern}", texture);
+            await loggingService.WriteExclusionLog($"Already exists on disk", texture);
             _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
-        if (exclusionService.IsExludedByPath(texture, out var matchingPathPattern))
+        string? matchingPattern = null;
+        if (exclusionService.IsExcludedByFilename(texture, out matchingPattern)
+            || exclusionService.IsExludedByPath(texture, out matchingPattern)
+            || exclusionService.IsExcludedByTarget(texture, out matchingPattern))
         {
             _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"Matches {matchingPathPattern}", texture);
-            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
-            return;
-        }
-
-        if (exclusionService.IsExcludedByTarget(texture, out var matchingTarget))
-        {
-            _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"Matches {matchingTarget}", texture);
+            await loggingService.WriteExclusionLog($"Matches {matchingPattern}", texture);
             _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
