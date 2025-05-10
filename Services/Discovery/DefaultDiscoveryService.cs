@@ -19,7 +19,7 @@ public class DefaultDiscoveryService(
 
         watch.Start();
 
-        for (var modIndex = mods.Count - 1; modIndex > 0; modIndex--)
+        for (var modIndex = mods.Count - 1; modIndex >= 0; modIndex--)
         {
             var mod = mods[modIndex];
 
