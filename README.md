@@ -35,6 +35,8 @@ I you want to use the `performance` settings instead, replace `default.json` by 
 --output       Required. Path where to store the output.
 
 --settings     (Default: default.json) Path to the settings file.
+
+--resume       Will use an existing output folder and process only missing files.
 ```
 
 ## Settings
