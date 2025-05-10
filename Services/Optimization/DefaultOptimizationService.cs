@@ -48,6 +48,8 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
                         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
                         Console.Write(
                             $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.TextureRelativePath}");
+                        
+                        stream.Dispose();
                     });
 
                     bsaSubTasks.Add(task);
@@ -64,7 +66,7 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
         {
             var looseTask = Task.Run(() =>
             {
-                var stream = File.OpenRead(texture.TextureAbsolutePath!);
+                using var stream = File.OpenRead(texture.TextureAbsolutePath!);
                 resizerService.Resize(stream, texture);
 
                 Interlocked.Increment(ref texturesOptimized);
