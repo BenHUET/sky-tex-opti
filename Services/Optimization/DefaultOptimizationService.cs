@@ -47,7 +47,7 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
                         Interlocked.Increment(ref texturesOptimized);
                         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
                         Console.Write(
-                            $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.TextureRelativePath}");
+                            $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
                         
                         stream.Dispose();
                     });
@@ -72,7 +72,7 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
                 Interlocked.Increment(ref texturesOptimized);
                 Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
                 Console.Write(
-                    $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.TextureRelativePath}");
+                    $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
             });
 
             tasks.Add(looseTask);
