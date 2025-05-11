@@ -12,6 +12,7 @@ public class Mo2ModsLoaderService(Options options) : IModsLoaderService
             .Where(m => m.StartsWith('+'))
             .Select(m => m.Remove(0, 1))
             .Select(m => new Mod(m, new DirectoryInfo(Path.Combine(modsFolder.FullName, "mods", m))))
+            .Reverse()
             .ToList();
     }
 }
