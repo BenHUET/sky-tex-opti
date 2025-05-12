@@ -79,7 +79,6 @@ public class DefaultDiscoveryService(
             || !texture.TextureRelativePath.EndsWith(".dds")
             || _discoveredTextures.ContainsKey(texture.TextureRelativePath))
         {
-            _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
