@@ -16,7 +16,7 @@ public class ImageMagickResizerService(
         try
         {
             using var image = new MagickImage(stream);
-
+            
             var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
             var initialResolution = PrettyResolution(image.Width, image.Height);
 
@@ -26,8 +26,39 @@ public class ImageMagickResizerService(
             else
                 scaleFactor = targetResolution / (float)image.Height;
 
-            image.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
-            await image.WriteAsync(outputPath);
+            if (image.HasAlpha)
+            {
+                using var combinedImage = new MagickImage(MagickColors.Black, (uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+                
+                var channels = image.Separate();
+                for (var i = 0; i < channels.Count; i++)
+                {
+                    var channel = channels[i];
+                    
+                    channel.FilterType = FilterType.Lanczos;
+                    channel.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+                    
+                    combinedImage.Composite(channel, i switch
+                    {
+                        0 => CompositeOperator.CopyRed,
+                        1 => CompositeOperator.CopyGreen,
+                        2 => CompositeOperator.CopyBlue,
+                        3 => CompositeOperator.CopyAlpha,
+                        _ => throw new ArgumentOutOfRangeException(null, "Something went wrong processing image's channels.")
+                    });
+                    
+                    channel.Dispose();
+                }
+
+                await combinedImage.WriteAsync(outputPath);
+            }
+            else
+            {
+                image.FilterType = FilterType.Lanczos;
+                image.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+                image.Settings.SetDefine(MagickFormat.Dds, "compression", "dxt1");
+                await image.WriteAsync(outputPath);
+            }
 
             stream.Close();
 
