@@ -48,7 +48,7 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
                         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
                         Console.Write(
                             $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
-                        
+
                         stream.Dispose();
                     });
 

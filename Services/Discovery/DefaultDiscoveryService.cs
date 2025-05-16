@@ -59,7 +59,7 @@ public class DefaultDiscoveryService(
         }
 
         watch.Stop();
-        
+
         var results = _discoveredTextures
             .Values
             .Where(t => t != null)
@@ -75,22 +75,20 @@ public class DefaultDiscoveryService(
 
     private async Task ProcessTexture(Texture texture, Func<Stream> getStream)
     {
-        if (!texture.TextureRelativePath.StartsWith("textures/") 
+        if (!texture.TextureRelativePath.StartsWith("textures/")
             || !texture.TextureRelativePath.EndsWith(".dds")
             || _discoveredTextures.ContainsKey(texture.TextureRelativePath))
-        {
             return;
-        }
 
         if (exclusionService.IsAlreadyExistant(texture))
         {
             _exclusionsCount++;
-            await loggingService.WriteExclusionLog($"Already exists on disk", texture);
+            await loggingService.WriteExclusionLog("Already exists on disk", texture);
             _discoveredTextures.TryAdd(texture.TextureRelativePath, null);
             return;
         }
 
-        string? matchingPattern = null;
+        string? matchingPattern;
         if (exclusionService.IsExcludedByFilename(texture, out matchingPattern)
             || exclusionService.IsExludedByPath(texture, out matchingPattern)
             || exclusionService.IsExcludedByTarget(texture, out matchingPattern))

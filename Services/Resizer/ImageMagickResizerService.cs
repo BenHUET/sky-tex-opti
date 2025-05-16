@@ -16,7 +16,7 @@ public class ImageMagickResizerService(
         try
         {
             using var image = new MagickImage(stream);
-            
+
             var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
             var initialResolution = PrettyResolution(image.Width, image.Height);
 
@@ -29,15 +29,15 @@ public class ImageMagickResizerService(
             if (image.HasAlpha)
             {
                 using var combinedImage = new MagickImage(MagickColors.Black, (uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
-                
+
                 var channels = image.Separate();
                 for (var i = 0; i < channels.Count; i++)
                 {
                     var channel = channels[i];
-                    
+
                     channel.FilterType = FilterType.Lanczos;
                     channel.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
-                    
+
                     combinedImage.Composite(channel, i switch
                     {
                         0 => CompositeOperator.CopyRed,
@@ -46,7 +46,7 @@ public class ImageMagickResizerService(
                         3 => CompositeOperator.CopyAlpha,
                         _ => throw new ArgumentOutOfRangeException(null, "Something went wrong processing image's channels.")
                     });
-                    
+
                     channel.Dispose();
                 }
 
@@ -68,6 +68,8 @@ public class ImageMagickResizerService(
         {
             await loggingService.WriteErrorLog($"Failed to resize {texture.TextureRelativePath}, reason : {e.Message}");
         }
+
+        return;
 
         string PrettyResolution(uint width, uint height)
         {

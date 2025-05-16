@@ -1,4 +1,5 @@
 using CommandLine;
+
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace SkyTexOpti.POCO;
@@ -16,7 +17,7 @@ public class Options
 
     [Option("settings", Default = "default.json", HelpText = "Path to the settings file.")]
     public string? SettingsPath { get; init; }
-    
+
     [Option("resume", Default = false, HelpText = "Will use an existing output folder and process only missing files.")]
     public bool Resume { get; init; }
 
