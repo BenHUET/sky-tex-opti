@@ -65,6 +65,7 @@ public class ImageMagickResizerService(
         catch (Exception e)
         {
             await loggingService.WriteErrorLog($"Failed to resize {texture.TextureRelativePath}, reason : {e.Message}");
+            throw;
         }
 
         return;

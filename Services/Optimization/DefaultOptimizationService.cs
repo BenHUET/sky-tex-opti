@@ -42,16 +42,24 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
 
                     var task = Task.Run(() =>
                     {
-                        resizerService.Resize(stream, texture);
+                        try
+                        {
+                            resizerService.Resize(stream, texture);
 
-                        Interlocked.Increment(ref texturesOptimized);
-                        Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-                        Console.Write(
-                            $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
-
-                        stream.Dispose();
-                        
-                        GC.Collect();
+                            Interlocked.Increment(ref texturesOptimized);
+                            Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
+                            Console.Write(
+                                $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                        finally
+                        {
+                            stream.Dispose();
+                            GC.Collect();
+                        }
                     });
 
                     bsaSubTasks.Add(task);
