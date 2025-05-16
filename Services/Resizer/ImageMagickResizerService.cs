@@ -59,9 +59,7 @@ public class ImageMagickResizerService(
                 image.Settings.SetDefine(MagickFormat.Dds, "compression", "dxt1");
                 await image.WriteAsync(outputPath);
             }
-
-            stream.Close();
-
+            
             await loggingService.WriteGeneralLog($"From {initialResolution} to {PrettyResolution(image.Width, image.Height)} (x{scaleFactor})", texture);
         }
         catch (Exception e)
