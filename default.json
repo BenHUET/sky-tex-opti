@@ -1,19 +1,14 @@
 {
   "targets": [
     {
-      "resolution": 512,
-      "suffixes": [
-        "_p.dds",
-        "_h.dds", "_height.dds"
-      ]
-    },
-    {
       "resolution": 1024,
       "suffixes": [
+        "_p.dds",
+        "_b.dds",
+        "_h.dds", "_height.dds",
         "_n.dds", "_normal.dds",
         "_e.dds", "_cubemap.dds",
         "_m.dds", "_reflections.dds",
-        "_c.dds", "_color.dds", "_basecolor.dds",
         "_emissive.dds", "_emit.dds", "_em.dds",
         "_g.dds", "_glow.dds", "_gloss.dds",
         "_a.dds", "_alpha.dds",
@@ -26,7 +21,7 @@
       "resolution": 2048,
       "suffixes": [
         "_msn.dds",
-        "_b.dds",
+        "_c.dds", "_color.dds", "_basecolor.dds",
         "_d.dds", "_diffuse.dds", ".dds" // files without a known suffix are considered diffuse files
       ]
     }
