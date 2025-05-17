@@ -24,50 +24,50 @@ public class ImageMagickResizerService(
                 scaleFactor = targetResolution / (float)image.Width;
             else
                 scaleFactor = targetResolution / (float)image.Height;
-            
+
             var initialResolution = (image.Width, image.Height);
             var resultResolution = (Width: (uint)(image.Width * scaleFactor), Height: (uint)(image.Height * scaleFactor));
 
             if (image.HasAlpha)
             {
-                using var combinedImage = new MagickImage(MagickColors.Black, resultResolution.Width, resultResolution.Height);
+                image.FilterType = FilterType.Lanczos;
+                
+                using var alphaChannel = image.Separate(Channels.Alpha)[0];
+                
+                image.Alpha(AlphaOption.Off);
+                image.ColorSpace = ColorSpace.RGB;
+                
+                alphaChannel.Resize(resultResolution.Width, resultResolution.Height);
+                image.Resize(resultResolution.Width, resultResolution.Height);
 
-                var channels = image.Separate();
-                for (var i = 0; i < channels.Count; i++)
-                {
-                    var channel = channels[i];
-
-                    channel.FilterType = FilterType.Lanczos;
-                    channel.Resize(resultResolution.Width, resultResolution.Height);
-
-                    combinedImage.Composite(channel, i switch
-                    {
-                        0 => CompositeOperator.CopyRed,
-                        1 => CompositeOperator.CopyGreen,
-                        2 => CompositeOperator.CopyBlue,
-                        3 => CompositeOperator.CopyAlpha,
-                        _ => throw new ArgumentOutOfRangeException(null, "Something went wrong processing image's channels.")
-                    });
-
-                    channel.Dispose();
-                }
-
-                await combinedImage.WriteAsync(outputPath);
+                image.ColorSpace = ColorSpace.sRGB;
+                image.Alpha(AlphaOption.On);
+                
+                image.Composite(alphaChannel, CompositeOperator.CopyAlpha);
+                
+                await image.WriteAsync(outputPath);
             }
             else
             {
                 image.FilterType = FilterType.Lanczos;
+                image.Settings.Compression = CompressionMethod.DXT1;
+
                 image.Resize(resultResolution.Width, resultResolution.Height);
-                image.Settings.SetDefine(MagickFormat.Dds, "compression", "dxt1");
+
                 await image.WriteAsync(outputPath);
             }
 
-            await loggingService.WriteGeneralLog($"From {PrettyResolution(initialResolution.Width, initialResolution.Height)} to {PrettyResolution(resultResolution.Width, resultResolution.Height)} (x{scaleFactor})", texture);
+            await loggingService.WriteGeneralLog(
+                $"From {PrettyResolution(initialResolution.Width, initialResolution.Height)} to {PrettyResolution(resultResolution.Width, resultResolution.Height)} (x{scaleFactor})",
+                texture);
         }
         catch (Exception e)
         {
             await loggingService.WriteErrorLog($"Failed to resize {texture.TextureRelativePath}, reason : {e.Message}");
-            throw;
+        }
+        finally
+        {
+            await stream.DisposeAsync();
         }
 
         return;
