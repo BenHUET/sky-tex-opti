@@ -40,34 +40,15 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
 
                     var stream = file.AsStream();
 
-                    var task = Task.Run(() =>
+                    var task = Task.Run(async () =>
                     {
-                        try
-                        {
-                            resizerService.Resize(stream, texture);
-
-                            Interlocked.Increment(ref texturesOptimized);
-                            Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-                            Console.Write(
-                                $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
-                        }
-                        catch
-                        {
-                            // ignored
-                        }
-                        finally
-                        {
-                            stream.Dispose();
-                            GC.Collect();
-                        }
+                        await ResizeTexture(stream, texture);
                     });
 
                     bsaSubTasks.Add(task);
                 }
 
                 await Task.WhenAll(bsaSubTasks);
-                
-                GC.Collect();
             });
 
             tasks.Add(bsaTask);
@@ -76,17 +57,10 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
         // Generate tasks for loose textures
         foreach (var texture in texturesFromLooseFiles)
         {
-            var looseTask = Task.Run(() =>
+            var looseTask = Task.Run(async () =>
             {
-                using var stream = File.OpenRead(texture.TextureAbsolutePath!);
-                resizerService.Resize(stream, texture);
-
-                Interlocked.Increment(ref texturesOptimized);
-                Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-                Console.Write(
-                    $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
-                
-                GC.Collect();
+                await using var stream = File.OpenRead(texture.TextureAbsolutePath!);
+                await ResizeTexture(stream, texture);
             });
 
             tasks.Add(looseTask);
@@ -99,5 +73,33 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
 
         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
         Console.WriteLine($"\r(100 % - {textures.Count}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... Done.");
+        
+        return;
+        
+        async Task ResizeTexture(Stream stream, Texture texture)
+        {
+            try
+            {
+                await resizerService.Resize(stream, texture);
+
+                Interlocked.Increment(ref texturesOptimized);
+                Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
+                Console.Write(
+                    $"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
+            }
+            catch
+            {
+                ;
+            }
+            finally
+            {
+                await stream.DisposeAsync();
+                
+                // prevent RAM usage from blowing up
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            }
+        }
     }
 }
