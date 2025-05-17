@@ -18,17 +18,19 @@ public class ImageMagickResizerService(
             using var image = new MagickImage(stream);
 
             var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
-            var initialResolution = PrettyResolution(image.Width, image.Height);
 
             float scaleFactor;
             if (image.Width < image.Height)
                 scaleFactor = targetResolution / (float)image.Width;
             else
                 scaleFactor = targetResolution / (float)image.Height;
+            
+            var initialResolution = (image.Width, image.Height);
+            var resultResolution = (Width: (uint)(image.Width * scaleFactor), Height: (uint)(image.Height * scaleFactor));
 
             if (image.HasAlpha)
             {
-                using var combinedImage = new MagickImage(MagickColors.Black, (uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+                using var combinedImage = new MagickImage(MagickColors.Black, resultResolution.Width, resultResolution.Height);
 
                 var channels = image.Separate();
                 for (var i = 0; i < channels.Count; i++)
@@ -36,7 +38,7 @@ public class ImageMagickResizerService(
                     var channel = channels[i];
 
                     channel.FilterType = FilterType.Lanczos;
-                    channel.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+                    channel.Resize(resultResolution.Width, resultResolution.Height);
 
                     combinedImage.Composite(channel, i switch
                     {
@@ -55,12 +57,12 @@ public class ImageMagickResizerService(
             else
             {
                 image.FilterType = FilterType.Lanczos;
-                image.Resize((uint)(image.Width * scaleFactor), (uint)(image.Height * scaleFactor));
+                image.Resize(resultResolution.Width, resultResolution.Height);
                 image.Settings.SetDefine(MagickFormat.Dds, "compression", "dxt1");
                 await image.WriteAsync(outputPath);
             }
 
-            await loggingService.WriteGeneralLog($"From {initialResolution} to {PrettyResolution(image.Width, image.Height)} (x{scaleFactor})", texture);
+            await loggingService.WriteGeneralLog($"From {PrettyResolution(initialResolution.Width, initialResolution.Height)} to {PrettyResolution(resultResolution.Width, resultResolution.Height)} (x{scaleFactor})", texture);
         }
         catch (Exception e)
         {
