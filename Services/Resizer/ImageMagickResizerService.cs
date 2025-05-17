@@ -16,6 +16,7 @@ public class ImageMagickResizerService(
         try
         {
             using var image = new MagickImage(stream);
+            image.FilterType = FilterType.Lanczos;
 
             var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
 
@@ -30,8 +31,6 @@ public class ImageMagickResizerService(
 
             if (image.HasAlpha)
             {
-                image.FilterType = FilterType.Lanczos;
-                
                 using var alphaChannel = image.Separate(Channels.Alpha)[0];
                 
                 image.Alpha(AlphaOption.Off);
@@ -49,7 +48,6 @@ public class ImageMagickResizerService(
             }
             else
             {
-                image.FilterType = FilterType.Lanczos;
                 image.Settings.Compression = CompressionMethod.DXT1;
 
                 image.Resize(resultResolution.Width, resultResolution.Height);
