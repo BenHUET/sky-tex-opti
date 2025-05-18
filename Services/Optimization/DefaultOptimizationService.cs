@@ -5,7 +5,10 @@ using SkyTexOpti.POCO;
 
 namespace SkyTexOpti.Services;
 
-public class DefaultOptimizationService(IResizerService resizerService) : IOptimizationService
+public class DefaultOptimizationService(
+    Options options,
+    IResizerService resizerService,
+    ILoggingService loggingService) : IOptimizationService
 {
     public async Task OptimizeTextures(ICollection<Texture> textures)
     {
@@ -78,11 +81,28 @@ public class DefaultOptimizationService(IResizerService resizerService) : IOptim
         
         async Task ResizeTexture(Stream stream, Texture texture)
         {
-            await resizerService.Resize(stream, texture);
+            try
+            {
+                var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
 
-            Interlocked.Increment(ref texturesOptimized);
-            Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-            Console.Write($"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
+                var outputPath = Path.Combine(options.OutputPath!.FullName, texture.TextureRelativePath);
+                new DirectoryInfo(outputPath).Parent!.Create();
+                
+                await resizerService.Resize(stream, texture, outputPath, targetResolution);
+                
+                
+                Interlocked.Increment(ref texturesOptimized);
+                Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
+                Console.Write($"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
+            }
+            catch (Exception e)
+            {
+                await loggingService.WriteErrorLog($"Failed to resize {texture.TextureRelativePath}, reason : {e.Message}");
+            }
+            finally
+            {
+                await stream.DisposeAsync();
+            }
         }
     }
 }

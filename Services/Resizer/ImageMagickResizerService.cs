@@ -3,76 +3,48 @@ using SkyTexOpti.POCO;
 
 namespace SkyTexOpti.Services;
 
-public class ImageMagickResizerService(
-    Options options,
-    ILoggingService loggingService
-) : IResizerService
+public class ImageMagickResizerService(ILoggingService loggingService) : IResizerService
 {
-    public async Task Resize(Stream stream, Texture texture)
+    public async Task Resize(Stream stream, Texture texture, string outputPath, uint targetResolution)
     {
-        var outputPath = Path.Combine(options.OutputPath!.FullName, texture.TextureRelativePath);
-        new DirectoryInfo(outputPath).Parent!.Create();
+        using var image = new MagickImage(stream);
+        image.FilterType = FilterType.Lanczos;
 
-        try
+        float scaleFactor;
+        if (image.Width < image.Height)
+            scaleFactor = targetResolution / (float)image.Width;
+        else
+            scaleFactor = targetResolution / (float)image.Height;
+
+        var initialResolution = (image.Width, image.Height);
+        var resultResolution = (Width: (uint)(image.Width * scaleFactor), Height: (uint)(image.Height * scaleFactor));
+
+        if (!image.IsOpaque)
         {
-            using var image = new MagickImage(stream);
-            image.FilterType = FilterType.Lanczos;
+            using var alphaChannel = image.Separate(Channels.Alpha)[0];
+            
+            image.Alpha(AlphaOption.Off);
+            image.ColorSpace = ColorSpace.RGB;
+            
+            alphaChannel.Resize(resultResolution.Width, resultResolution.Height);
+            image.Resize(resultResolution.Width, resultResolution.Height);
 
-            var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
-
-            float scaleFactor;
-            if (image.Width < image.Height)
-                scaleFactor = targetResolution / (float)image.Width;
-            else
-                scaleFactor = targetResolution / (float)image.Height;
-
-            var initialResolution = (image.Width, image.Height);
-            var resultResolution = (Width: (uint)(image.Width * scaleFactor), Height: (uint)(image.Height * scaleFactor));
-
-            if (image.HasAlpha)
-            {
-                using var alphaChannel = image.Separate(Channels.Alpha)[0];
-                
-                image.Alpha(AlphaOption.Off);
-                image.ColorSpace = ColorSpace.RGB;
-                
-                alphaChannel.Resize(resultResolution.Width, resultResolution.Height);
-                image.Resize(resultResolution.Width, resultResolution.Height);
-
-                image.ColorSpace = ColorSpace.sRGB;
-                image.Alpha(AlphaOption.On);
-                
-                image.Composite(alphaChannel, CompositeOperator.CopyAlpha);
-                
-                await image.WriteAsync(outputPath);
-            }
-            else
-            {
-                image.Settings.Compression = CompressionMethod.DXT1;
-
-                image.Resize(resultResolution.Width, resultResolution.Height);
-
-                await image.WriteAsync(outputPath);
-            }
-
-            await loggingService.WriteGeneralLog(
-                $"From {PrettyResolution(initialResolution.Width, initialResolution.Height)} to {PrettyResolution(resultResolution.Width, resultResolution.Height)} (x{scaleFactor})",
-                texture);
+            image.ColorSpace = ColorSpace.sRGB;
+            image.Alpha(AlphaOption.On);
+            
+            image.Composite(alphaChannel, CompositeOperator.CopyAlpha);
+            
+            await image.WriteAsync(outputPath);
         }
-        catch (Exception e)
+        else
         {
-            await loggingService.WriteErrorLog($"Failed to resize {texture.TextureRelativePath}, reason : {e.Message}");
-        }
-        finally
-        {
-            await stream.DisposeAsync();
+            image.Settings.Compression = CompressionMethod.DXT1;
+
+            image.Resize(resultResolution.Width, resultResolution.Height);
+
+            await image.WriteAsync(outputPath);
         }
 
-        return;
-
-        string PrettyResolution(uint width, uint height)
-        {
-            return $"{width}x{height}";
-        }
+        await loggingService.WriteGeneralLog($"From {initialResolution.Width}x{initialResolution.Height} to {resultResolution.Width}x{resultResolution.Height} (x{scaleFactor})", texture);
     }
 }
