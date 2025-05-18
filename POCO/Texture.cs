@@ -6,4 +6,6 @@ public class Texture
     public string? BsaPath { get; init; }
     public string? TextureAbsolutePath { get; init; }
     public required string TextureRelativePath { get; init; }
+    public uint? Height { get; set; }
+    public uint? Width { get; set; }
 }

@@ -84,14 +84,22 @@ public class DefaultOptimizationService(
             try
             {
                 var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
+                
+                float scaleFactor;
+                if (texture.Width < texture.Height)
+                    scaleFactor = targetResolution / (float)texture.Width!;
+                else
+                    scaleFactor = targetResolution / (float)texture.Height!;
 
                 var outputPath = Path.Combine(options.OutputPath!.FullName, texture.TextureRelativePath);
                 new DirectoryInfo(outputPath).Parent!.Create();
                 
-                await resizerService.Resize(stream, texture, outputPath, targetResolution);
+                await resizerService.Resize(stream, texture, outputPath, scaleFactor);
                 
+                await loggingService.WriteGeneralLog($"From {texture.Width}x{texture.Height} to {(int)(texture.Width! * scaleFactor)}x{(int)(texture.Height! * scaleFactor)} (x{scaleFactor})", texture);
                 
                 Interlocked.Increment(ref texturesOptimized);
+                
                 Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
                 Console.Write($"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
             }

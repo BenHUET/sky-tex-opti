@@ -49,6 +49,10 @@ public class DefaultExclusionService(Options options) : IExclusionService
             reason = "Too small";
             return true;
         }
+        
+        // TODO : move this elsewhere (not in the exclusion service)
+        texture.Height = headers.Height;
+        texture.Width = headers.Width;
 
         return false;
     }

@@ -3,21 +3,15 @@ using SkyTexOpti.POCO;
 
 namespace SkyTexOpti.Services;
 
-public class ImageMagickResizerService(ILoggingService loggingService) : IResizerService
+public class ImageMagickResizerService : IResizerService
 {
-    public async Task Resize(Stream stream, Texture texture, string outputPath, uint targetResolution)
+    public async Task Resize(Stream stream, Texture texture, string outputPath, float scaleFactor)
     {
         using var image = new MagickImage(stream);
         image.FilterType = FilterType.Lanczos;
-
-        float scaleFactor;
-        if (image.Width < image.Height)
-            scaleFactor = targetResolution / (float)image.Width;
-        else
-            scaleFactor = targetResolution / (float)image.Height;
-
-        var initialResolution = (image.Width, image.Height);
-        var resultResolution = (Width: (uint)(image.Width * scaleFactor), Height: (uint)(image.Height * scaleFactor));
+        
+        var targetWidth = (uint)(texture.Width! * scaleFactor);
+        var targetHeight = (uint)(texture.Height! * scaleFactor);
 
         if (!image.IsOpaque)
         {
@@ -26,8 +20,8 @@ public class ImageMagickResizerService(ILoggingService loggingService) : IResize
             image.Alpha(AlphaOption.Off);
             image.ColorSpace = ColorSpace.RGB;
             
-            alphaChannel.Resize(resultResolution.Width, resultResolution.Height);
-            image.Resize(resultResolution.Width, resultResolution.Height);
+            alphaChannel.Resize(targetWidth, targetHeight);
+            image.Resize(targetWidth, targetHeight);
 
             image.ColorSpace = ColorSpace.sRGB;
             image.Alpha(AlphaOption.On);
@@ -40,11 +34,9 @@ public class ImageMagickResizerService(ILoggingService loggingService) : IResize
         {
             image.Settings.Compression = CompressionMethod.DXT1;
 
-            image.Resize(resultResolution.Width, resultResolution.Height);
+            image.Resize(targetWidth, targetHeight);
 
             await image.WriteAsync(outputPath);
         }
-
-        await loggingService.WriteGeneralLog($"From {initialResolution.Width}x{initialResolution.Height} to {resultResolution.Width}x{resultResolution.Height} (x{scaleFactor})", texture);
     }
 }
