@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Archives;
+using Pfim;
 using SkyTexOpti.POCO;
 
 namespace SkyTexOpti.Services;
@@ -99,10 +100,15 @@ public class DefaultDiscoveryService(
             return;
         }
 
-        await using var stream = getStream();
         try
         {
-            if (exclusionService.IsExcludedByResolution(texture, stream, out var exclusionResolutionReason))
+            await using var stream = getStream();
+
+            var headers = new DdsHeader(stream);
+            texture.Height = headers.Height;
+            texture.Width = headers.Width;
+            
+            if (exclusionService.IsExcludedByResolution(texture, out var exclusionResolutionReason))
             {
                 _exclusionsCount++;
                 await loggingService.WriteExclusionLog(exclusionResolutionReason!, texture);

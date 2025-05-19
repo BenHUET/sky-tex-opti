@@ -1,5 +1,4 @@
 using System.IO.Enumeration;
-using Pfim;
 using SkyTexOpti.POCO;
 
 namespace SkyTexOpti.Services;
@@ -38,21 +37,16 @@ public class DefaultExclusionService(Options options) : IExclusionService
         return matchingTarget == null;
     }
 
-    public bool IsExcludedByResolution(Texture texture, Stream stream, out string? reason)
+    public bool IsExcludedByResolution(Texture texture, out string? reason)
     {
         reason = null;
-        var headers = new DdsHeader(stream);
         var targetResolution = options.Targets.First(t => texture.TextureRelativePath.EndsWith(t.Key)).Value;
 
-        if (headers.Height <= targetResolution || headers.Width <= targetResolution)
+        if (texture.Height <= targetResolution || texture.Width <= targetResolution)
         {
             reason = "Too small";
             return true;
         }
-        
-        // TODO : move this elsewhere (not in the exclusion service)
-        texture.Height = headers.Height;
-        texture.Width = headers.Width;
 
         return false;
     }
