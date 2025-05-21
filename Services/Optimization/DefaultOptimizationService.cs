@@ -56,7 +56,7 @@ public class DefaultOptimizationService(
         watch.Stop();
 
         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-        Console.WriteLine($"\r(100 % - {textures.Count}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... Done.");
+        Console.WriteLine($"\r(100 % - {textures.Count:n0}/{textures.Count:n0} - {watch.Elapsed:c}) Optimizing textures... Done.");
         
         return;
         
@@ -82,7 +82,7 @@ public class DefaultOptimizationService(
                 Interlocked.Increment(ref texturesOptimized);
                 
                 Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-                Console.Write($"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized}/{textures.Count} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
+                Console.Write($"\r({texturesOptimized / (float)textures.Count:p} - {texturesOptimized:n0}/{textures.Count:n0} - {watch.Elapsed:c}) Optimizing textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
             }
             catch (Exception e)
             {

@@ -19,7 +19,7 @@ public class StandaloneDiscoveryService : IDiscoveryService
             var mod = mods[modIndex];
 
             Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-            Console.Write($"\r({(mods.Count - modIndex) / (float)mods.Count:p} - {mods.Count - modIndex}/{mods.Count} - {watch.Elapsed:c}) Discovering textures to optimize... {mods[modIndex].Name}");
+            Console.Write($"\r({(mods.Count - modIndex) / (float)mods.Count:p} - {mods.Count - modIndex:n0}/{mods.Count:n0} - {watch.Elapsed:c}) Discovering textures to optimize... {mods[modIndex].Name}");
 
             // From BSA archives
             foreach (var archive in mod.Path.EnumerateFiles("*.bsa", SearchOption.AllDirectories))
@@ -58,7 +58,7 @@ public class StandaloneDiscoveryService : IDiscoveryService
         watch.Stop();
 
         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-        Console.WriteLine($"\r(100 % - {mods.Count}/{mods.Count} - {watch.Elapsed:c}) Discovering textures to optimize... Found {textures.Count:n0} textures.");
+        Console.WriteLine($"\r(100 % - {mods.Count:n0}/{mods.Count:n0} - {watch.Elapsed:c}) Discovering textures to optimize... Found {textures.Count:n0} textures.");
 
         return Task.FromResult<ICollection<Texture>>(textures.Select(kpv => kpv.Value).ToArray());
     }

@@ -58,7 +58,7 @@ public class DefaultExclusionService(
         watch.Stop();
         
         Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-        Console.WriteLine($"\r(100 % - {textures.Count}/{textures.Count} - {watch.Elapsed:c}) Excluding textures... Excluded {texturesExcludedCount:n0} textures.");
+        Console.WriteLine($"\r(100 % - {textures.Count:n0}/{textures.Count:n0} - {watch.Elapsed:c}) Excluding textures... Excluded {texturesExcludedCount:n0} textures.");
 
         return texturesToOptimize.ToList();
 
@@ -76,7 +76,7 @@ public class DefaultExclusionService(
             }
             
             Console.Write($"\r{"".PadLeft(Console.CursorLeft, ' ')}");
-            Console.Write($"\r({texturesProcessedCount / (float)textures.Count:p} - {texturesProcessedCount}/{textures.Count} - {watch.Elapsed:c}) Excluding textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
+            Console.Write($"\r({texturesProcessedCount / (float)textures.Count:p} - {texturesProcessedCount:n0}/{textures.Count:n0} - {watch.Elapsed:c}) Excluding textures... {texture.Mod.Name} - {texture.TextureRelativePath}");
         }
     }
 

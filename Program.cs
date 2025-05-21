@@ -86,7 +86,7 @@ public static class Program
         {
             Console.Write("Getting mods... ");
             mods = await modsLoaderService.GetOrderedModList();
-            Console.WriteLine($"Found {mods.Count} enabled.");
+            Console.WriteLine($"Found {mods.Count:n0} enabled.");
         }
         catch (Exception e)
         {
