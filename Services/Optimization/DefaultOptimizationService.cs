@@ -1,7 +1,6 @@
 using System.Diagnostics;
-using Mutagen.Bethesda;
-using Mutagen.Bethesda.Archives;
 using SkyTexOpti.POCO;
+using SkyTexOpti.Services.Helpers;
 
 namespace SkyTexOpti.Services;
 
@@ -30,28 +29,10 @@ public class DefaultOptimizationService(
         for (var archiveIndex = 0; archiveIndex < texturesGroupedByArchive.Count; archiveIndex++)
         {
             var entry = texturesGroupedByArchive.ElementAt(archiveIndex);
-            var bsaTask = Task.Run(async () =>
+
+            var bsaTask = BsaHelpers.GetBsaTask(entry.Key, textures, async (stream, texture) =>
             {
-                var bsaSubTasks = new List<Task>();
-                var bsaReader = Archive.CreateReader(GameRelease.SkyrimSE, entry.Key);
-                foreach (var file in bsaReader.Files)
-                {
-                    var texture = entry.Value.FirstOrDefault(t => t.TextureRelativePath == file.Path);
-
-                    if (texture == null)
-                        continue;
-
-                    var stream = file.AsStream();
-
-                    var task = Task.Run(async () =>
-                    {
-                        await ResizeTexture(stream, texture);
-                    });
-
-                    bsaSubTasks.Add(task);
-                }
-
-                await Task.WhenAll(bsaSubTasks);
+                await ResizeTexture(stream, texture);
             });
 
             tasks.Add(bsaTask);

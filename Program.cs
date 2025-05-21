@@ -19,7 +19,7 @@ public static class Program
                 builder.Services.AddSingleton<ILoggingService, LoggingService>();
                 builder.Services.AddSingleton<Options>(_ => o);
                 builder.Services.AddTransient<ISettingsParserService, JsonSettingsParserService>();
-                builder.Services.AddTransient<IDiscoveryService, DefaultDiscoveryService>();
+                builder.Services.AddTransient<IDiscoveryService, StandaloneDiscoveryService>();
                 builder.Services.AddTransient<IExclusionService, DefaultExclusionService>();
                 builder.Services.AddTransient<IResizerService, ImageMagickResizerService>();
                 builder.Services.AddTransient<IOptimizationService, DefaultOptimizationService>();
@@ -35,9 +35,10 @@ public static class Program
                 var settingsParserService = app.Services.GetRequiredService<ISettingsParserService>();
                 var modsLoaderService = app.Services.GetRequiredService<IModsLoaderService>();
                 var discoveryService = app.Services.GetRequiredService<IDiscoveryService>();
+                var exclusionService = app.Services.GetRequiredService<IExclusionService>();
                 var optimizationService = app.Services.GetRequiredService<IOptimizationService>();
 
-                return Run(options, settingsParserService, modsLoaderService, discoveryService, optimizationService);
+                return Run(options, settingsParserService, modsLoaderService, discoveryService, exclusionService, optimizationService);
             });
     }
 
@@ -46,6 +47,7 @@ public static class Program
         ISettingsParserService settingsParserService,
         IModsLoaderService modsLoaderService,
         IDiscoveryService discoveryService,
+        IExclusionService exclusionService,
         IOptimizationService optimizationService
     )
     {
@@ -94,8 +96,11 @@ public static class Program
 
         // Discover textures
         var textures = await discoveryService.GetTextures(mods);
+        
+        // Excluding textures
+        var texturesToOptimize = await exclusionService.ExcludeTextures(textures);
 
         // Optimize textures
-        await optimizationService.OptimizeTextures(textures);
+        await optimizationService.OptimizeTextures(texturesToOptimize);
     }
 }
