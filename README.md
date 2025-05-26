@@ -47,3 +47,17 @@ It's easy to make your own and use it with `--settings new_settings.json`.
 Provided settings file :
 - `default.json` : 2k diffuse, 1024 for normals, 512 for the rest
 - `performance.json` : 2k diffuse, 1024 for the rest
+
+## Known issues
+
+### Black artifacts
+
+It is coming from ImageMagick itself, there is a workaround implemented that will split the alpha channel from the image and resize them separately before merging them back together. This method is automatically used when a texture is not fully opaque. This is slower but will give proper results.
+
+### RAM usage
+
+The program will use more and more RAM as it runs, from what I've seen, it's unmanaged memory not being released by MagickNET. PR welcome.
+
+### PBR textures are brighter
+
+Some PBR textures are using their alpha channel for something else than transparency and resizing them with ImageMagick is yielding brighter images. A workaround is to exclude them in the settings.
