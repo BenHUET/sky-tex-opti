@@ -56,6 +56,8 @@ It is coming from ImageMagick itself, there is a workaround implemented that wil
 
 ### RAM usage
 
+https://github.com/dlemstra/Magick.NET/issues/1854
+
 The program will use more and more RAM as it runs, from what I've seen, it's unmanaged memory not being released by MagickNET. PR welcome.
 
 ### PBR textures are brighter
