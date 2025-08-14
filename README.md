@@ -60,6 +60,8 @@ https://github.com/dlemstra/Magick.NET/issues/1854
 
 The program will use more and more RAM as it runs, from what I've seen, it's unmanaged memory not being released by MagickNET. PR welcome.
 
+**UPDATE** : might have been fixed by https://github.com/dlemstra/Magick.NET/commit/693d61adf126588bc086f299e41025916047f216 . I upgraded the dependencies but I have no modlist to test it against for now.
+
 ### PBR textures are brighter
 
 Some PBR textures are using their alpha channel for something else than transparency and resizing them with ImageMagick is yielding brighter images. A workaround is to exclude them in the settings.
