@@ -14,7 +14,7 @@ public static class BsaHelpers
             var bsaReader = Archive.CreateReader(GameRelease.SkyrimSE, bsaPath);
             foreach (var file in bsaReader.Files)
             {
-                var texture = textures.FirstOrDefault(t => t.TextureRelativePath == file.Path);
+                var texture = textures.FirstOrDefault(t => t.TextureRelativePath.Equals(file.Path, StringComparison.OrdinalIgnoreCase));
 
                 if (texture == null)
                     continue;
