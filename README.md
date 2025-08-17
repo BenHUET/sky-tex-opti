@@ -45,8 +45,8 @@ Settings files are JSON files instructing the software which textures should be 
 It's easy to make your own and use it with `--settings new_settings.json`.
 
 Provided settings file :
-- `default.json` : 2k diffuse, 1024 for normals, 512 for the rest
-- `performance.json` : 2k diffuse, 1024 for the rest
+- `default.json` : 2k diffuse, 1024 for normals
+- `performance.json` : 2k diffuse, 1024 for the rest, 512 for the rest
 
 ## Known issues
 
